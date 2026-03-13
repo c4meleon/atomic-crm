@@ -31,7 +31,10 @@ export function SalesCreate() {
     },
   });
   const onSubmit: SubmitHandler<SalesFormData> = async (data) => {
-    mutate(data);
+    mutate({
+      ...data,
+      password: data.password?.trim() || undefined,
+    });
   };
 
   return (

@@ -50,6 +50,14 @@
           "type": "registry:component"
         },
         {
+          "path": "src/components/atomic-crm/tasks/tasksKanbanUtils.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/tasks/taskWorkflowStatus.ts",
+          "type": "registry:component"
+        },
+        {
           "path": "src/components/atomic-crm/tasks/TasksListFilter.tsx",
           "type": "registry:component"
         },
@@ -59,6 +67,10 @@
         },
         {
           "path": "src/components/atomic-crm/tasks/TasksListByDueDate.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/tasks/TasksKanban.tsx",
           "type": "registry:component"
         },
         {
@@ -175,6 +187,10 @@
         },
         {
           "path": "src/components/atomic-crm/sales/SaleName.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/sales/SaleAvatar.tsx",
           "type": "registry:component"
         },
         {
@@ -647,6 +663,10 @@
         },
         {
           "path": "src/components/atomic-crm/contacts/contactGender.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/contacts/contactExport.ts",
           "type": "registry:component"
         },
         {

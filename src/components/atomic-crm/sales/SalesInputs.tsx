@@ -16,6 +16,11 @@ export function SalesInputs() {
         validate={[required(), email()]}
         helperText={false}
       />
+      <TextInput
+        source="password"
+        type="password"
+        helperText="Leave empty to keep the current password (or send invite email on create)."
+      />
       <BooleanInput
         source="administrator"
         readOnly={record?.id === identity?.id}
