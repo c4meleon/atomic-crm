@@ -18,9 +18,11 @@ export function SalesCreate() {
     mutationFn: async (data: SalesFormData) => {
       return dataProvider.salesCreate(data);
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       notify(
-        "User created. They will soon receive an email to set their password.",
+        variables.password
+          ? "User created with the password you provided."
+          : "User created. They will soon receive an email to set their password.",
       );
       redirect("/sales");
     },

@@ -7,6 +7,10 @@ import type { Sale } from "../types";
 export function SalesInputs() {
   const { identity } = useGetIdentity();
   const record = useRecordContext<Sale>();
+  const passwordHelperText = record
+    ? "Leave empty to keep the current password."
+    : "Leave empty to send an invite email instead.";
+
   return (
     <div className="space-y-4 w-full">
       <TextInput source="first_name" validate={required()} helperText={false} />
@@ -19,7 +23,7 @@ export function SalesInputs() {
       <TextInput
         source="password"
         type="password"
-        helperText="Leave empty to keep the current password (or send invite email on create)."
+        helperText={passwordHelperText}
       />
       <BooleanInput
         source="administrator"

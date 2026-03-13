@@ -30,7 +30,9 @@ const getSaleName = (sale?: Sale) => {
   return name.length > 0 ? name : undefined;
 };
 
-const exportContactsToCsv = async (contacts: ReturnType<typeof buildContactsExportRows>) =>
+const exportContactsToCsv = async (
+  contacts: ReturnType<typeof buildContactsExportRows>,
+) =>
   new Promise<string>((resolve, reject) => {
     jsonExport(contacts, {}, (error, csv) => {
       if (error) {
@@ -56,7 +58,8 @@ export const buildContactsExportRows = (
 ) =>
   records.map((contact) => {
     const company =
-      getRelatedRecord(companies, contact.company_id)?.name ?? contact.company_name;
+      getRelatedRecord(companies, contact.company_id)?.name ??
+      contact.company_name;
     const salesName = getSaleName(getRelatedRecord(sales, contact.sales_id));
     const tagNames = (contact.tags ?? [])
       .map((tagId) => getRelatedRecord(tags, tagId)?.name)

@@ -7,6 +7,7 @@ import { TaskListFilter } from "./TasksListFilter";
 
 const today = new Date();
 const iso = (d: Date) => d.toISOString();
+const loadMoreLabel = /^(Load more|crm\.load_more)$/;
 
 const createTask = (id: number, dueDate: Date, doneDate?: Date) => ({
   id,
@@ -44,7 +45,9 @@ describe("TaskListFilter", () => {
         wrapper: Wrapper,
       },
     );
-    await expect.element(screen.getByText("Today")).toBeInTheDocument();
+    expect(screen.container.querySelector(".mb-2 p")?.textContent).toBe(
+      "Today",
+    );
   });
 
   it("does not show Load more when tasks fit in one page", async () => {
@@ -66,7 +69,7 @@ describe("TaskListFilter", () => {
         wrapper: Wrapper,
       },
     );
-    await expect.element(screen.getByText("Load more")).toBeInTheDocument();
+    await expect.element(screen.getByText(loadMoreLabel)).toBeInTheDocument();
   });
 
   it("Load more increases visible page size", async () => {
@@ -79,13 +82,15 @@ describe("TaskListFilter", () => {
     );
 
     expect(screen.getByText(/Task \d+/)).toHaveLength(5);
-    const loadMore = screen.getByText("Load more");
+    const loadMore = screen.getByText(loadMoreLabel);
 
     await loadMore.click();
 
     // check the number of rendered tasks after clicking Load more
     await expect(screen.getByText(/Task \d+/)).toHaveLength(8);
     // After clicking, all 8 tasks fit in one page (5 + 10 = 15), so Load more disappears
-    await expect.element(screen.getByText("Load more")).not.toBeInTheDocument();
+    await expect
+      .element(screen.getByText(loadMoreLabel))
+      .not.toBeInTheDocument();
   });
 });

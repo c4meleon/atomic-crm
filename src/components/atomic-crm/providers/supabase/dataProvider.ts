@@ -125,10 +125,7 @@ const dataProviderWithCustomMethods = {
 
     return data.data;
   },
-  async salesUpdate(
-    id: Identifier,
-    data: Partial<SalesFormData>,
-  ) {
+  async salesUpdate(id: Identifier, data: Partial<SalesFormData>) {
     const {
       email,
       first_name,

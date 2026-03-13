@@ -15,7 +15,9 @@ type ContactExportRecord = Contact & {
   phone_fts?: string;
 };
 
-const buildContact = (overrides: Partial<ContactExportRecord> = {}): ContactExportRecord => ({
+const buildContact = (
+  overrides: Partial<ContactExportRecord> = {},
+): ContactExportRecord => ({
   background: "",
   company_id: null,
   company_name: undefined,

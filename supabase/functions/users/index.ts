@@ -65,6 +65,28 @@ async function updateSaleAvatar(user_id: string, avatar: string) {
   return sales.at(0);
 }
 
+async function sendInviteEmailIfNeeded(
+  email: string,
+  password?: string,
+): Promise<Response | null> {
+  if (password) {
+    return null;
+  }
+
+  const { error: emailError } =
+    await supabaseAdmin.auth.admin.inviteUserByEmail(email);
+
+  if (emailError) {
+    console.error(`Error inviting user, email_error=${emailError}`);
+    return createErrorResponse(
+      emailError.status ?? 500,
+      emailError.message || "Failed to send invitation mail",
+    );
+  }
+
+  return null;
+}
+
 async function inviteUser(req: Request, currentUserSale: any) {
   const payload = await req.json();
   const { email, first_name, last_name, disabled, administrator } = payload;
@@ -135,6 +157,14 @@ async function inviteUser(req: Request, currentUserSale: any) {
         administrator,
       });
 
+      const inviteErrorResponse = await sendInviteEmailIfNeeded(
+        email,
+        password,
+      );
+      if (inviteErrorResponse) {
+        return inviteErrorResponse;
+      }
+
       return new Response(
         JSON.stringify({
           data: sale,
@@ -164,18 +194,9 @@ async function inviteUser(req: Request, currentUserSale: any) {
       return createErrorResponse(500, "Internal Server Error");
     }
 
-    // If an explicit password is provided, we can skip the invitation email.
-    if (!password) {
-      const { error: emailError } =
-        await supabaseAdmin.auth.admin.inviteUserByEmail(email);
-
-      if (emailError) {
-        console.error(`Error inviting user, email_error=${emailError}`);
-        return createErrorResponse(
-          emailError.status ?? 500,
-          emailError.message || "Failed to send invitation mail",
-        );
-      }
+    const inviteErrorResponse = await sendInviteEmailIfNeeded(email, password);
+    if (inviteErrorResponse) {
+      return inviteErrorResponse;
     }
   }
 
@@ -247,7 +268,10 @@ async function patchUser(req: Request, currentUserSale: any) {
   }
 
   const { data, error: userError } =
-    await supabaseAdmin.auth.admin.updateUserById(sale.user_id, updateUserPayload);
+    await supabaseAdmin.auth.admin.updateUserById(
+      sale.user_id,
+      updateUserPayload,
+    );
 
   if (!data?.user || userError) {
     console.error("Error patching user:", userError);

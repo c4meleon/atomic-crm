@@ -1,8 +1,4 @@
-import {
-  InfiniteListBase,
-  useGetIdentity,
-  useListContext,
-} from "ra-core";
+import { InfiniteListBase, useGetIdentity, useListContext } from "ra-core";
 import { BulkActionsToolbar } from "@/components/admin/bulk-actions-toolbar";
 import { CreateButton } from "@/components/admin/create-button";
 import { ExportButton } from "@/components/admin/export-button";
