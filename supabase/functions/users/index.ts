@@ -33,7 +33,6 @@ async function createSale(
   user_id: string,
   data: {
     email: string;
-    password: string;
     first_name: string;
     last_name: string;
     disabled: boolean;
@@ -67,18 +66,32 @@ async function updateSaleAvatar(user_id: string, avatar: string) {
 }
 
 async function inviteUser(req: Request, currentUserSale: any) {
-  const { email, password, first_name, last_name, disabled, administrator } =
-    await req.json();
+  const payload = await req.json();
+  const { email, first_name, last_name, disabled, administrator } = payload;
+  const password =
+    typeof payload.password === "string" && payload.password.trim().length > 0
+      ? payload.password
+      : undefined;
 
   if (!currentUserSale.administrator) {
     return createErrorResponse(401, "Not Authorized");
   }
 
-  const { data, error: userError } = await supabaseAdmin.auth.admin.createUser({
+  const createUserPayload: {
+    email: string;
+    password?: string;
+    user_metadata: { first_name: string; last_name: string };
+  } = {
     email,
-    password,
     user_metadata: { first_name, last_name },
-  });
+  };
+
+  if (password) {
+    createUserPayload.password = password;
+  }
+
+  const { data, error: userError } =
+    await supabaseAdmin.auth.admin.createUser(createUserPayload);
 
   let user = data?.user;
 
@@ -116,7 +129,6 @@ async function inviteUser(req: Request, currentUserSale: any) {
 
       const sale = await createSale(user.id, {
         email,
-        password,
         first_name,
         last_name,
         disabled,
@@ -151,12 +163,19 @@ async function inviteUser(req: Request, currentUserSale: any) {
       console.error("Error inviting user: undefined user");
       return createErrorResponse(500, "Internal Server Error");
     }
-    const { error: emailError } =
-      await supabaseAdmin.auth.admin.inviteUserByEmail(email);
 
-    if (emailError) {
-      console.error(`Error inviting user, email_error=${emailError}`);
-      return createErrorResponse(500, "Failed to send invitation mail");
+    // If an explicit password is provided, we can skip the invitation email.
+    if (!password) {
+      const { error: emailError } =
+        await supabaseAdmin.auth.admin.inviteUserByEmail(email);
+
+      if (emailError) {
+        console.error(`Error inviting user, email_error=${emailError}`);
+        return createErrorResponse(
+          emailError.status ?? 500,
+          emailError.message || "Failed to send invitation mail",
+        );
+      }
     }
   }
 
@@ -179,6 +198,7 @@ async function inviteUser(req: Request, currentUserSale: any) {
 }
 
 async function patchUser(req: Request, currentUserSale: any) {
+  const payload = await req.json();
   const {
     sales_id,
     email,
@@ -187,7 +207,11 @@ async function patchUser(req: Request, currentUserSale: any) {
     avatar,
     administrator,
     disabled,
-  } = await req.json();
+  } = payload;
+  const password =
+    typeof payload.password === "string" && payload.password.trim().length > 0
+      ? payload.password
+      : undefined;
   const { data: sale } = await supabaseAdmin
     .from("sales")
     .select("*")
@@ -203,12 +227,27 @@ async function patchUser(req: Request, currentUserSale: any) {
     return createErrorResponse(401, "Not Authorized");
   }
 
+  if (password && !currentUserSale.administrator) {
+    return createErrorResponse(401, "Not Authorized");
+  }
+
+  const updateUserPayload: {
+    email: string;
+    ban_duration: string;
+    user_metadata: { first_name: string; last_name: string };
+    password?: string;
+  } = {
+    email,
+    ban_duration: disabled ? "87600h" : "none",
+    user_metadata: { first_name, last_name },
+  };
+
+  if (password && currentUserSale.administrator) {
+    updateUserPayload.password = password;
+  }
+
   const { data, error: userError } =
-    await supabaseAdmin.auth.admin.updateUserById(sale.user_id, {
-      email,
-      ban_duration: disabled ? "87600h" : "none",
-      user_metadata: { first_name, last_name },
-    });
+    await supabaseAdmin.auth.admin.updateUserById(sale.user_id, updateUserPayload);
 
   if (!data?.user || userError) {
     console.error("Error patching user:", userError);

@@ -29,6 +29,7 @@ import {
 
 import { useConfigurationContext } from "../root/ConfigurationContext";
 import { SaleName } from "../sales/SaleName";
+import { SaleAvatar } from "../sales/SaleAvatar";
 import type { Contact, Sale, Task as TData } from "../types";
 import { TaskEdit } from "./TaskEdit";
 import { TaskEditSheet } from "./TaskEditSheet";
@@ -292,13 +293,17 @@ export const Task = ({
                     const sale = referenceRecord as Sale | undefined;
                     if (!sale) return null;
                     return (
-                      <>
-                        {" • "}
-                        {translate("resources.tasks.fields.sales_id", {
-                          _: "Assigned to",
-                        })}
-                        : <SaleName sale={sale} />
-                      </>
+                      <span className="inline-flex items-center gap-1.5">
+                        <span>•</span>
+                        <span>
+                          {translate("resources.tasks.fields.sales_id", {
+                            _: "Assigned to",
+                          })}
+                          :
+                        </span>
+                        <SaleAvatar sale={sale} size={20} />
+                        <SaleName sale={sale} />
+                      </span>
                     );
                   }}
                 />

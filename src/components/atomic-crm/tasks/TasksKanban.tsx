@@ -28,10 +28,12 @@ import {
   getTaskPatchForDestination,
   type TasksKanbanGroupBy,
 } from "./tasksKanbanUtils";
+import { SaleAvatar } from "../sales/SaleAvatar";
 
 type TaskKanbanColumn = {
   id: string;
   label: string;
+  sale?: Sale;
 };
 
 type TasksByColumn = Record<string, TaskData[]>;
@@ -166,6 +168,7 @@ export const TasksKanban = ({
         return {
           id,
           label: `${sale.first_name} ${sale.last_name}`.trim(),
+          sale,
         };
       });
 
@@ -306,7 +309,14 @@ export const TasksKanban = ({
               className="min-w-[300px] max-w-[380px] flex-1 pb-8"
             >
               <div className="flex flex-col items-center">
-                <h3 className="text-base font-medium">{column.label}</h3>
+                {column.sale ? (
+                  <div className="flex items-center gap-2">
+                    <SaleAvatar sale={column.sale} size={20} />
+                    <h3 className="text-base font-medium">{column.label}</h3>
+                  </div>
+                ) : (
+                  <h3 className="text-base font-medium">{column.label}</h3>
+                )}
                 <p className="text-sm text-muted-foreground">
                   {columnTasks.length}
                 </p>
